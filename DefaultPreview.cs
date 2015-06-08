@@ -25,7 +25,7 @@ namespace Vizr.API
 	                        </Paragraph>
 
                             <Paragraph>
-		                        <Run Text=""{Binding ParentResult.Provider.UniqueName}""/>
+		                        <Run Text=""{Binding ParentResult.Provider.UniqueName, Mode=OneWay}""/>
 	                        </Paragraph>
                         </FlowDocument>";
             }
