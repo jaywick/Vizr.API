@@ -15,9 +15,10 @@ namespace Vizr.API
         {
             var scoredResults = new List<ScoredResult>();
 
-            if (queryText == "")
+            if (queryText == "" && results.Any())
             {
                 var maxRecentResults = 10;
+
                 return _history.Items
                     .GroupBy(x => x.ToString())
                     .OrderByDescending(g => g.Count())

@@ -23,6 +23,12 @@ namespace Vizr.API
 
         public static void Load(IResultProvider provider)
         {
+            var prefValue = Read(provider);
+            GetPrefProperty(provider).SetValue(provider, prefValue);
+        }
+
+        public static dynamic Read(IResultProvider provider)
+        {
             var prefType = provider.GetType().GetInterfaces()
                 .Single(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IHasPreferences<>))
                 .GetGenericArguments().Single();
@@ -33,13 +39,11 @@ namespace Vizr.API
             {
                 var newPrefValue = Activator.CreateInstance(prefType);
                 GetPrefProperty(provider).SetValue(provider, newPrefValue);
-                return;
+                return newPrefValue;
             }
 
             var jsonContent = File.ReadAllText(preferencesPath);
-            var prefValue = JsonConvert.DeserializeObject(jsonContent, prefType, Converters);
-
-            GetPrefProperty(provider).SetValue(provider, prefValue);
+            return JsonConvert.DeserializeObject(jsonContent, prefType, Converters);
         }
 
         public static void Save(IResultProvider provider)

@@ -11,27 +11,27 @@ namespace Vizr.API
         /// <summary>
         /// Unique name of provider such as 'com.example.myprovider'
         /// </summary>
-        string UniqueName { get; set; }
+        string UniqueName { get; }
+
+        /// <summary>
+        /// Friendly name identifiable to the user
+        /// </summary>
+        string Name { get; }
 
         /// <summary>
         /// FontAwesome icon key to display on a result
         /// </summary>
-        string Icon { get; set; }
+        string Icon { get; }
 
         /// <summary>
-        /// Called when the application is loaded in the background, for example on system start
+        /// Called when the application is started
         /// </summary>
-        void OnBackgroundStart();
-
-        /// <summary>
-        /// Called when application is brought onto the screen, for example when hotkey is pressed
-        /// </summary>
-        void OnAppStart();
+        void OnStart();
 
         /// <summary>
         /// Called when application is closed from the screen
         /// </summary>
-        void OnAppHide();
+        void OnExit();
 
         /// <summary>
         /// Called when user changes query text
@@ -39,15 +39,10 @@ namespace Vizr.API
         void OnQueryChange(string queryText);
 
         /// <summary>
-        /// Called when preferences are changed
-        /// </summary>
-        void OnPreferencesUpdated();
-
-        /// <summary>
         /// List of all IResults from this provider
         /// </summary>
         /// <param name="message">Search query from the user</param>
-        /// <returns>List of Result based on input <paramref name="message"/></returns>
+        /// <returns>List of IResult based on input <paramref name="message"/></returns>
         IEnumerable<IResult> Items { get; set; }
     }
 }

@@ -10,6 +10,10 @@ namespace Vizr.API
     {
         public static DirectoryInfo Root { get; private set; }
 
+        public static string LogFilePath {
+            get { return Path.Combine(Root.FullName, "log.txt") ; }
+        }
+
         static Workspace()
         {
             var appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
