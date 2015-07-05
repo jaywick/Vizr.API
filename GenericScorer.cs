@@ -24,7 +24,8 @@ namespace Vizr.API
                     .OrderByDescending(g => g.Count())
                     .Take(maxRecentResults)
                     .Select(g => g.Key)
-                    .Select((h, i) => new ScoredResult(maxRecentResults - i, results.First(r => r.ID == h)));
+                    .Select((h, i) => new ScoredResult(maxRecentResults - i, results.FirstOrDefault(r => r.ID == h)))
+                    .Where(x => x.Result != null);
             }
 
             foreach (IResult result in results)
@@ -64,7 +65,7 @@ namespace Vizr.API
             yield return target.ToLower().StartsWith(searchText.ToLower()) ? searchText.Length * 3 : 0;
 
             // basic contains (fallback)
-            yield return target.ToLower().Contains(searchText.ToLower()) ? searchText.Length * 0.5 : 0;
+            yield return target.ToLower().Contains(searchText.ToLower()) ? searchText.Length * 0.1 : 0;
         }
 
         /*public static IEnumerable<IEnumerable<string>> GetConsecutiveWordPermutations(string target)
