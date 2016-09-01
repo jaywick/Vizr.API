@@ -19,6 +19,11 @@ namespace Vizr.API
         string Title { get; set; }
 
         /// <summary>
+        /// Displays extra information regarding the IResult
+        /// </summary>
+        string Description { get; set; }
+
+        /// <summary>
         /// Reference to parent ResultProvider which created it
         /// </summary>
         IResultProvider Provider { get; set; }
