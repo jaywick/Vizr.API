@@ -9,24 +9,15 @@ namespace Vizr.API
 {
     public class GenericScorer : IResultScorer
     {
-        private History _history = new History();
+        private HitCounts _hitCounts = new HitCounts();
+        private static readonly int HitCountWeight = 10;
 
         public IEnumerable<ScoredResult> Score(string queryText, IEnumerable<IResult> results)
         {
             var scoredResults = new List<ScoredResult>();
 
-            if (queryText == "" && results.Any())
-            {
-                var maxRecentResults = 10;
-
-                return _history.Items
-                    .GroupBy(x => x.ToString())
-                    .OrderByDescending(g => g.Count())
-                    .Take(maxRecentResults)
-                    .Select(g => g.Key)
-                    .Select((h, i) => new ScoredResult(maxRecentResults - i, results.FirstOrDefault(r => r.ID == h)))
-                    .Where(x => x.Result != null);
-            }
+            if (string.IsNullOrWhiteSpace(queryText))
+                return GetDefaultResults(results);
 
             foreach (IResult result in results)
             {
@@ -34,11 +25,25 @@ namespace Vizr.API
                     .Select(x => new { Score = Score(x.Text, queryText), Weight = x.Weight })
                     .Sum(x => x.Score * x.Weight);
 
-                scoredResults.Add(new ScoredResult(score, result));
+                int finalScore = 0;
+                if (score > 0)
+                    finalScore = (score + _hitCounts.GetHits(result)) * (HitCountWeight + 1);
+
+                scoredResults.Add(new ScoredResult(finalScore, result));
             }
 
             return scoredResults
                 .Where(x => x.Score > 0);
+        }
+
+        private IEnumerable<ScoredResult> GetDefaultResults(IEnumerable<IResult> results)
+        {
+            var maxRecentResults = 10;
+
+            return _hitCounts.Hits
+                .OrderByDescending(x => x.Value)
+                .Take(maxRecentResults)
+                .Select((x, index) => new ScoredResult(x.Value, results.SingleOrDefault(r => r.ID.ToString() == x.Key)));
         }
 
         private int Score(string target, string searchText)
@@ -68,32 +73,12 @@ namespace Vizr.API
             yield return target.ToLower().Contains(searchText.ToLower()) ? searchText.Length * 0.1 : 0;
         }
 
-        /*public static IEnumerable<IEnumerable<string>> GetConsecutiveWordPermutations(string target)
-        {
-            if (String.IsNullOrWhiteSpace(target))
-                yield break;
-
-            var words = SplitByWordsDistinct(target);
-            var lastIndex = words.Count() - 1;
-
-            foreach (var skip in Enumerable.Range(0, lastIndex))
-            {
-                foreach (var take in Enumerable.Range(1, lastIndex))
-                {
-                    if (take + skip < words.Count())
-                        yield return words.Skip(skip).Take(take);
-                }
-            }
-        }*/
-
         public static IEnumerable<string> SplitWords(string target)
         {
             return Regex
                 .Split(target, @"(?<=[A-Z])(?=[A-Z][a-z])|(?<=[^A-Z])(?=[A-Z])|(?<=[A-Za-z])(?=[^A-Za-z])|(\W)")
                 .Where(x => !String.IsNullOrWhiteSpace(x))
                 .Select(x => x.Trim());
-
-            //return target.Split(new[] { " ", "-", "@", ".", "_", "/", "\\", "," }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         public static IEnumerable<Tuple<T, T>> JoinWhere<T>(IEnumerable<T> target, IEnumerable<T> second, Func<T, T, bool> predicate)

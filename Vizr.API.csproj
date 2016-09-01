@@ -44,6 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
+    <Compile Include="HitCounts.cs" />
+    <Compile Include="JsonConverters\HashConverter.cs" />
     <Compile Include="RenderIssuePreview.cs" />
     <Compile Include="DefaultPreview.cs" />
     <Compile Include="FontAwesomeIcons.cs" />

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Vizr.API.Extensions;
 
 namespace Vizr.API
 {
@@ -31,7 +32,7 @@ namespace Vizr.API
 
         public static Hash CreateFrom(params object[] compositeItems)
         {
-            var compositeKey = String.Join(" ", compositeItems.ToString());
+            var compositeKey = compositeItems.Select(x => x.ToString()).Join(" ");
             var messageBytes = Encoding.Default.GetBytes(compositeKey);
             var sha512 = new SHA512Managed().ComputeHash(messageBytes);
 
@@ -53,34 +54,31 @@ namespace Vizr.API
             return Convert.ToBase64String(_key);
         }
 
+        public override bool Equals(object obj)
+        {
+            return this == (obj as Hash);
+        }
+
         public static bool operator ==(Hash a, Hash b)
         {
+            if (object.ReferenceEquals(a, null))
+                return false;
+
+            if (object.ReferenceEquals(b, null))
+                return false;
+
             return a._key.SequenceEqual(b._key);
         }
 
         public static bool operator !=(Hash a, Hash b)
         {
+            if (object.ReferenceEquals(a, null))
+                return false;
+
+            if (object.ReferenceEquals(b, null))
+                return false;
+
             return !a._key.SequenceEqual(b._key);
-        }
-
-        public static bool operator ==(Hash a, string b)
-        {
-            return a.ToString() == b;
-        }
-
-        public static bool operator !=(Hash a, string b)
-        {
-            return a.ToString() != b;
-        }
-
-        public static bool operator ==(string a, Hash b)
-        {
-            return a.ToString() == b;
-        }
-
-        public static bool operator !=(string a, Hash b)
-        {
-            return a.ToString() != b;
         }
 
         public override int GetHashCode()

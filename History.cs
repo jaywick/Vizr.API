@@ -10,38 +10,45 @@ using Vizr.API;
 
 namespace Vizr
 {
+    [Obsolete("History is no longer supported. Use Hitcounts to determine how often item hashes are exectued.")]
     public class History
     {
         private static readonly string _historyFilePath = System.IO.Path.Combine(Workspace.Root.FullName, "history.json");
 
-        private List<HistoryItem> _items = new List<HistoryItem>();
-        public IEnumerable<Hash> Items { get { return _items.Select(x => Hash.Parse(x.ID)); } }
+        [Obsolete("History is no longer supported. Use Hitcounts to determine how often item hashes are exectued.")]
+        private List<HistoryItem> _historyItems = new List<HistoryItem>();
+
+        [Obsolete("History is no longer supported. Use Hitcounts to determine how often item hashes are exectued.")]
+        public IEnumerable<Hash> Items { get { return _historyItems.Select(x => Hash.Parse(x.ID)); } }
 
         public History()
         {
-            ReadFile();
+            ReadHistoryFile();
         }
 
         public void Add(IResult result, string query)
         {
-            _items.Add(new HistoryItem(result.ID, query));
-            SaveFile();
+            _historyItems.Add(new HistoryItem(result.ID, query));
+            SaveHistoryFile();
         }
 
-        private void ReadFile()
+        [Obsolete("History is no longer supported. Use Hitcounts to determine how often item hashes are exectued.")]
+        private void ReadHistoryFile()
         {
             if (!File.Exists(_historyFilePath))
-                SaveFile();
+                SaveHistoryFile();
 
             var historyData = File.ReadAllText(_historyFilePath);
-            _items = JsonConvert.DeserializeObject<List<HistoryItem>>(historyData) ?? new List<HistoryItem>();
+            _historyItems = JsonConvert.DeserializeObject<List<HistoryItem>>(historyData) ?? new List<HistoryItem>();
         }
 
-        private void SaveFile()
+        [Obsolete("History is no longer supported. Use Hitcounts to determine how often item hashes are exectued.")]
+        private void SaveHistoryFile()
         {
-            File.WriteAllText(_historyFilePath, JsonConvert.SerializeObject(_items, Formatting.Indented));
+            File.WriteAllText(_historyFilePath, JsonConvert.SerializeObject(_historyItems, Formatting.Indented));
         }
 
+        [Obsolete("History is no longer supported. Use Hitcounts to determine how often item hashes are exectued.")]
         private class HistoryItem
         {
             public string ID;

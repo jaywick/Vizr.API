@@ -14,6 +14,7 @@ namespace Vizr.API
         {
             new JsonConverters.DirectoryInfoConverter(),
             new JsonConverters.FileInfoConverter(),
+            new JsonConverters.HashConverter(),
         };
 
         public static string GetProviderPrefPath(IResultProvider provider)
